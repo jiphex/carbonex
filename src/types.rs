@@ -41,7 +41,7 @@ mod datetime_without_seconds {
     }
 }
 
-#[derive(Debug,serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 pub struct Data<T> {
     pub data: Vec<T>,
 }
@@ -54,8 +54,8 @@ impl<T> Deref for Data<T> {
     }
 }
 
-#[derive(Debug,serde::Deserialize,EnumIter)]
-#[serde(rename_all="lowercase")]
+#[derive(Debug, serde::Deserialize, EnumIter)]
+#[serde(rename_all = "lowercase")]
 pub enum PowerType {
     Gas,
     Coal,
@@ -68,22 +68,22 @@ pub enum PowerType {
     Solar,
 }
 
-#[derive(Debug,serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 pub struct GenerationMix {
     pub fuel: PowerType,
     #[serde(rename = "perc")]
     pub percent: f64,
 }
 
-#[derive(Debug,serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum IntensityIndex {
-    #[serde(rename="very low")]
+    #[serde(rename = "very low")]
     VeryLow,
     Low,
     Moderate,
     High,
-    #[serde(rename="very high")]
+    #[serde(rename = "very high")]
     VeryHigh,
 }
 
@@ -99,24 +99,24 @@ impl IntensityIndex {
     }
 }
 
-#[derive(Debug,serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 pub struct IntensitySummary {
     pub forecast: f64,
     pub index: IntensityIndex,
 }
 
-#[derive(Debug,serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 pub struct IntensityData {
     #[serde(with = "datetime_without_seconds")]
     pub from: DateTime<Utc>,
     #[serde(with = "datetime_without_seconds")]
     pub to: DateTime<Utc>,
     pub intensity: IntensitySummary,
-    #[serde(rename="generationmix")]
+    #[serde(rename = "generationmix")]
     pub generation_mix: Vec<GenerationMix>,
 }
 
-#[derive(Debug,serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 pub struct Region {
     #[serde(rename = "regionid")]
     pub region_id: u64,
