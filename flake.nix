@@ -14,7 +14,7 @@
       {
         defaultPackage = naersk-lib.buildPackage {
           src = ./.;
-          nativeBuildInputs = with pkgs; [ "pkg-config" ];
+          nativeBuildInputs = with pkgs; [ pkg-config ];
           buildInputs = with pkgs; [ openssl ];
         };
         devShell = with pkgs; mkShell {
