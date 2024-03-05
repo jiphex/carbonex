@@ -1,14 +1,13 @@
-use std::{collections::BTreeMap, net::SocketAddr, str::FromStr, time::Duration};
+use std::{net::SocketAddr, str::FromStr, time::Duration};
 
-use metrics::{gauge, Gauge};
+use metrics::gauge;
 use metrics_exporter_prometheus::PrometheusBuilder;
-use strum::IntoEnumIterator;
 use tokio::time::sleep;
-use tracing::{info, instrument};
+use tracing::{debug, info, instrument};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 use carbonex::{
-    types::{self, PowerType, PowerTypeIter, Region},
+    types::{self, Region},
     Config,
 };
 
@@ -27,14 +26,14 @@ fn get_config() -> color_eyre::Result<Config> {
     })
 }
 
-#[instrument(level="INFO")]
+#[instrument(level = "INFO")]
 async fn run_exporter_loop(postcode: String) {
     let forecast_metric_name = "carbon_regional_intensity_forecast_gco2e";
     let forecast_intensity = gauge!(forecast_metric_name,"postcode" => postcode.clone());
     let index_metric_name = "carbon_regional_intensity_index";
     let index_intensity = gauge!(index_metric_name,"postcode" => postcode.clone());
     // let generation_mix: BTreeMap<String,Gauge> = PowerType::iter().map(|t| {
-        // gauge!("carbon_regional_power_x");
+    // gauge!("carbon_regional_power_x");
     // });
     let url = format!("https://api.carbonintensity.org.uk/regional/postcode/{postcode}");
     loop {
@@ -47,8 +46,20 @@ async fn run_exporter_loop(postcode: String) {
         // println!("got {:?}", body.bytes().await.expect("x"));
         let dat: types::Data<Region> = body.json().await.unwrap();
         let region = dat.first().unwrap();
+        debug!(
+            region_data_count = region.region_data.len(),
+            "got region data"
+        );
         forecast_intensity.set(region.region_data.first().unwrap().intensity.forecast);
-        index_intensity.set(region.region_data.first().unwrap().intensity.index.metric_value() as f64);
+        index_intensity.set(
+            region
+                .region_data
+                .first()
+                .unwrap()
+                .intensity
+                .index
+                .metric_value() as f64,
+        );
         // println!("{dat:?}");
         sleep(Duration::from_secs(60 * 10)).await;
     }
