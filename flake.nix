@@ -12,7 +12,7 @@
         naersk-lib = pkgs.callPackage naersk { };
       in
       {
-        defaultPackage = naersk-lib.buildPackage {
+        packages.default = naersk-lib.buildPackage {
           src = ./.;
           nativeBuildInputs = with pkgs; [ pkg-config ];
           buildInputs = with pkgs; [ openssl ];
@@ -41,7 +41,7 @@
                 Group = "carboninex";
                 DynamicUser = true;
                 Restart = "always";
-                ExecStart = "${self.packages."${system}".default}/bin/cmd";
+                ExecStart = "${self.packages."${system}".default}/bin/carbonex";
               };
             };
           };
